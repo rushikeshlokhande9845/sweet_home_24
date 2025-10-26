@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SweetHome Delights - Live Chat</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="user.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="api.js"></script>
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #f0f9ff 100%);
+        }
+        
+        .chat-container {
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .customer-message {
+            background-color: #fce7f3;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+        
+        .admin-message {
+            background-color: #dbeafe;
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .message-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .remove-message-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .remove-message-btn:hover {
+            opacity: 1;
+        }
+        
+        .message-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            padding: 15px 0;
+        }
+        
+        .input-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .input-container input:focus {
+            border-color: #ec4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+        
+        .input-container button {
+            background-color: #ec4899;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .input-container button:hover {
+            background-color: #db2777;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ec4899;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: #ec4899;
+        }
+        
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-processing {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-delivered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .typing-indicator {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #f3f4f6;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .typing-indicator span {
+            animation: blink 1.4s infinite;
+            opacity: 0.6;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        /* Real-time indicator */
+        .real-time-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .real-time-indicator.syncing {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sync-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-pink-50">
+
+<!-- Real-time sync indicator -->
+<div class="real-time-indicator" id="sync-indicator">
+    <div class="sync-spinner"></div>
+    <span>Syncing...</span>
+</div>
+
+<!-- Navigation -->
+<nav class="bg-pink-600 text-white shadow-lg sticky top-0 z-10">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <i data-feather="home" class="text-pink-200"></i>
+      <a href="index.html" class="text-2xl font-bold">SweetHome Delights</a>
+    </div>
+    <div class="hidden md:flex space-x-6">
+      <a href="index.html" class="hover:text-pink-200 font-medium">Home</a>
+      <a href="menu.html" class="hover:text-pink-200 font-medium">Menu</a>
+      <a href="cart.html" class="hover:text-pink-200 font-medium">Cart</a>
+      <a href="wishlist.html" class="hover:text-pink-200 font-medium">Wishlist</a>
+      <a href="chat.html" class="font-medium bg-pink-700 text-white px-4 py-2 rounded-full">Live Chat</a>
+      <a href="orders.html" class="hover:text-pink-200 font-medium">Orders</a>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="cart.html" class="hover:text-pink-200 relative">
+        <i data-feather="shopping-cart"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+      </a>
+      <a href="wishlist.html" class="hover:text-pink-200 relative">
+        <i data-feather="heart"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="wishlist-count">0</span>
+      </a>
+      <div id="user-profile" class="hover:text-pink-200"></div>
+      <div id="user-menu"></div>
+      <button class="md:hidden focus:outline-none" id="menu-toggle">
+        <i data-feather="menu"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile Menu -->
+  <div class="md:hidden hidden bg-pink-700 px-4 py-2" id="mobile-menu">
+    <a href="index.html" class="block py-2 hover:text-pink-200">Home</a>
+    <a href="menu.html" class="block py-2 hover:text-pink-200">Menu</a>
+    <a href="cart.html" class="block py-2 hover:text-pink-200 flex items-center justify-between">
+        <span>Cart</span>
+        <span id="cart-count-mobile-menu" class="text-sm bg-white text-pink-600 rounded-full px-2">0</span>
+    </a>
+    <a href="wishlist.html" class="block py-2 hover:text-pink-200">Wishlist</a>
+    <a href="chat.html" class="block py-2 hover:text-pink-200 text-pink-200">Live Chat</a>
+    <a href="orders.html" class="block py-2 hover:text-pink-200">Order Board</a>
+    <a href="index.html#contact" class="block py-2 hover:text-pink-200">Contact</a>
+  </div>
+</nav>
+
+<!-- Chat Header -->
+<section class="py-12 bg-pink-700 text-white">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Live Chat</h1>
+    <p class="text-xl">Chat with us about your cake orders</p>
+  </div>
+</section>
+
+<!-- Chat Content -->
+<section class="py-8">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Chat Section -->
+      <div class="lg:col-span-2">
+        <div class="chat-container">
+          <div class="messages-container" id="messages-container">
+            <!-- Messages will be loaded here -->
+            <div class="text-center text-gray-500 py-10" id="no-messages">
+              <i data-feather="message-circle" class="w-12 h-12 mx-auto mb-4 text-pink-300"></i>
+              <p>No messages yet. Start a conversation about your cake order!</p>
+            </div>
+          </div>
+          
+          <div class="input-container">
+            <input type="text" id="message-input" placeholder="Type your message about cake orders..." autocomplete="off">
+            <button id="send-button">
+              <i data-feather="send" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order Board Section -->
+      <div>
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+          <h3 class="text-xl font-bold text-pink-700 mb-6">Recent Orders</h3>
+          <div id="orders-list">
+            <!-- Orders will be loaded here -->
+            <div class="text-center text-gray-500 py-10" id="no-orders">
+              <i data-feather="clipboard" class="w-12 h-12 mx-auto mb-4 text-pink-300"></i>
+              <p>No orders yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-pink-900 text-white py-8">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">SweetHome Delights</h3>
+        <p>The home of delicious Indian cakes since 2010.</p>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Quick Links</h4>
+        <ul class="space-y-2">
+          <li><a href="index.html" class="hover:text-pink-300">Home</a></li>
+          <li><a href="menu.html" class="hover:text-pink-300">Menu</a></li>
+          <li><a href="cart.html" class="hover:text-pink-300">Cart</a></li>
+          <li><a href="wishlist.html" class="hover:text-pink-300">Wishlist</a></li>
+          <li><a href="chat.html" class="hover:text-pink-300">Live Chat</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Opening Hours</h4>
+        <ul class="space-y-2">
+          <li>Monday - Friday: 9AM - 9PM</li>
+          <li>Saturday - Sunday: 10AM - 10PM</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Payment Methods</h4>
+        <div class="flex space-x-4">
+          <i data-feather="credit-card" class="w-8 h-8"></i>
+          <i data-feather="dollar-sign" class="w-8 h-8"></i>
+          <i data-feather="smartphone" class="w-8 h-8"></i>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-pink-800 mt-8 pt-8 text-center">
+      <p>&copy; 2023 SweetHome Delights. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Initialize all functionality when DOM is loaded and scripts are available
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Initialize feather icons if available
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+    
+    // Update cart count if function is available
+    if (typeof updateCartCount !== 'undefined') {
+        updateCartCount();
+    }
+    
+    // Initialize wishlist if function is available
+    if (typeof initializeWishlist !== 'undefined') {
+        initializeWishlist();
+    }
+    
+    // Chat functionality
+    const messagesContainer = document.getElementById('messages-container');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const noMessagesEl = document.getElementById('no-messages');
+    const ordersListEl = document.getElementById('orders-list');
+    const noOrdersEl = document.getElementById('no-orders');
+    const syncIndicator = document.getElementById('sync-indicator');
+    
+    // Get current user
+    let currentUser = { name: 'Guest', isAdmin: false };
+    if (typeof getCurrentUser !== 'undefined') {
+        const user = getCurrentUser();
+        if (user) {
+            currentUser.name = user.username;
+            currentUser.isAdmin = typeof isAdmin !== 'undefined' && isAdmin();
+        }
+    }
+    
+    // Check if Firebase is available
+    const useFirebase = typeof firebase !== 'undefined' && typeof chatRef !== 'undefined';
+    
+    // Load messages and orders
+    loadMessages();
+    loadOrders();
+    
+    // Set up real-time updates
+    setupRealTimeUpdates();
+    
+    // Send message on button click
+    sendButton.addEventListener('click', sendMessage);
+    
+    // Send message on Enter key
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    // Function to show sync indicator
+    function showSyncIndicator() {
+        syncIndicator.classList.add('syncing');
+        setTimeout(() => {
+            syncIndicator.classList.remove('syncing');
+        }, 1000);
+    }
+    
+    // Function to set up real-time updates
+    function setupRealTimeUpdates() {
+        if (useFirebase) {
+            // Use Firebase for real-time updates
+            chatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                addMessageToUI(message);
+                checkForOrder(message);
+            });
+            
+            ordersRef.on('child_added', (snapshot) => {
+                showSyncIndicator();
+                loadOrders();
+            });
+        } else {
+            // Fallback to localStorage events
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'chatMessages') {
+                    showSyncIndicator();
+                    loadMessages();
+                } else if (e.key === 'orders') {
+                    showSyncIndicator();
+                    loadOrders();
+                }
+            });
+            
+            // Also check for changes every 2 seconds (for same-tab updates)
+            setInterval(() => {
+                const storedMessages = localStorage.getItem('chatMessages');
+                const storedOrders = localStorage.getItem('orders');
+                
+                if (storedMessages) {
+                    const messages = JSON.parse(storedMessages);
+                    const currentMessages = Array.from(messagesContainer.querySelectorAll('.message'))
+                        .map(el => el.dataset.messageId);
+                    
+                    // Check if we have new messages
+                    if (messages.length > currentMessages.length) {
+                        loadMessages();
+                    }
+                }
+                
+                if (storedOrders) {
+                    const orders = JSON.parse(storedOrders);
+                    const currentOrders = Array.from(ordersListEl.querySelectorAll('.order-card'))
+                        .map(el => el.dataset.orderId);
+                    
+                    // Check if we have new orders
+                    if (orders.length > currentOrders.length) {
+                        loadOrders();
+                    }
+                }
+            }, 2000);
+        }
+    }
+    
+    // Function to send a message
+    function sendMessage() {
+        const messageText = messageInput.value.trim();
+        if (!messageText) return;
+        
+        // Create message object
+        const message = {
+            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            sender: currentUser.name,
+            isAdmin: currentUser.isAdmin,
+            text: messageText,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Save message
+        saveMessage(message);
+        
+        // Clear input
+        messageInput.value = '';
+        
+        // Add message to UI
+        addMessageToUI(message);
+        
+        // Check if message contains order information
+        checkForOrder(message);
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Simulate admin response for demo
+        if (!currentUser.isAdmin) {
+            simulateAdminResponse(message);
+        }
+    }
+    
+    // Function to load messages from storage
+    function loadMessages() {
+        if (useFirebase) {
+            chatRef.once('value').then((snapshot) => {
+                const messages = [];
+                snapshot.forEach((childSnapshot) => {
+                    messages.push(childSnapshot.val());
+                });
+                displayMessages(messages);
+            });
+        } else {
+            const messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+            displayMessages(messages);
+        }
+    }
+    
+    // Function to display messages
+    function displayMessages(messages) {
+        if (messages.length > 0) {
+            noMessagesEl.style.display = 'none';
+            messagesContainer.innerHTML = '';
+            messages.forEach(message => {
+                addMessageToUI(message);
+            });
+        }
+    }
+    
+    // Function to save message to storage
+    function saveMessage(message) {
+        if (useFirebase) {
+            chatRef.push(message);
+        } else {
+            const messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+            messages.push(message);
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            
+            // Dispatch custom event for same-tab updates
+            window.dispatchEvent(new CustomEvent('chatMessageAdded', { detail: message }));
+        }
+    }
+    
+    // Function to add message to UI
+    function addMessageToUI(message) {
+        // Remove "no messages" placeholder if it exists
+        if (noMessagesEl.style.display !== 'none') {
+            noMessagesEl.style.display = 'none';
+        }
+        
+        // Check if message already exists
+        if (document.querySelector(`[data-message-id="${message.id}"]`)) {
+            return;
+        }
+        
+        // Create message element
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${message.isAdmin ? 'admin-message' : 'customer-message'}`;
+        messageEl.dataset.messageId = message.id;
+        
+        // Format timestamp
+        const timestamp = new Date(message.timestamp);
+        const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageEl.innerHTML = `
+            <div class="message-header">
+                <span class="message-sender">${escapeHtml(message.sender)}${message.isAdmin ? ' (Admin)' : ''}</span>
+                <div class="message-actions">
+                    <span class="message-time">${timeString}</span>
+                    <button class="remove-message-btn" data-message-id="${message.id}">✕</button>
+                </div>
+            </div>
+            <div class="message-text">${escapeHtml(message.text)}</div>
+        `;
+        
+        messagesContainer.appendChild(messageEl);
+        
+        // Add event listener to remove button
+        const removeBtn = messageEl.querySelector('.remove-message-btn');
+        removeBtn.addEventListener('click', function() {
+            removeMessage(message.id);
+        });
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Function to load orders from storage
+    function loadOrders() {
+        if (useFirebase) {
+            ordersRef.once('value').then((snapshot) => {
+                const orders = [];
+                snapshot.forEach((childSnapshot) => {
+                    orders.push(childSnapshot.val());
+                });
+                displayOrders(orders);
+            });
+        } else {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            displayOrders(orders);
+        }
+    }
+    
+    // Function to display orders
+    function displayOrders(orders) {
+        if (orders.length > 0) {
+            noOrdersEl.style.display = 'none';
+            renderOrders(orders);
+        }
+    }
+    
+    // Function to save order to storage
+    function saveOrder(order) {
+        if (useFirebase) {
+            ordersRef.push(order);
+        } else {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Dispatch custom event for same-tab updates
+            window.dispatchEvent(new CustomEvent('orderAdded', { detail: order }));
+        }
+    }
+    
+    // Function to render orders
+    function renderOrders(orders) {
+        ordersListEl.innerHTML = '';
+        
+        // Show only the 10 most recent orders
+        const recentOrders = orders.slice(-10).reverse();
+        
+        if (recentOrders.length === 0) {
+            noOrdersEl.style.display = 'block';
+            return;
+        }
+        
+        recentOrders.forEach(order => {
+            // Check if order card already exists
+            if (document.querySelector(`[data-order-id="${order.orderID}"]`)) {
+                return;
+            }
+            
+            const orderEl = document.createElement('div');
+            orderEl.className = 'order-card';
+            orderEl.dataset.orderId = order.orderID;
+            
+            // Format order date
+            const orderDate = new Date(order.orderDate);
+            const dateString = orderDate.toLocaleDateString();
+            
+            // Get status class
+            let statusClass = 'status-pending';
+            if (order.status === 'Processing') statusClass = 'status-processing';
+            if (order.status === 'Delivered') statusClass = 'status-delivered';
+            
+            orderEl.innerHTML = `
+                <div class="order-header">
+                    <span class="order-id">#${escapeHtml(order.orderID)}</span>
+                    <span class="order-status ${statusClass}">${escapeHtml(order.status)}</span>
+                </div>
+                <p class="text-gray-600 text-sm mb-2">${escapeHtml(order.customerInfo.name)}</p>
+                <p class="text-gray-800 font-medium mb-1">${order.items.length} item(s) - ₹${order.total}</p>
+                <p class="text-gray-500 text-sm">${escapeHtml(dateString)}</p>
+            `;
+            
+            ordersListEl.appendChild(orderEl);
+        });
+    }
+    
+    // Enhanced function to check if message contains order information
+    function checkForOrder(message) {
+        // More comprehensive order detection
+        const orderIndicators = [
+            'order', 'buy', 'want', 'need', 'get', 
+            'cake', 'kg', 'kilogram', 'pound', 'lb',
+            'deliver', 'delivery', 'ship', 'send',
+            'black forest', 'chocolate', 'vanilla', 'strawberry',
+            'red velvet', 'cheesecake', 'marble', 'fruit'
+        ];
+        
+        const lowerText = message.text.toLowerCase();
+        
+        // Check if message contains order-related keywords
+        const isOrderMessage = orderIndicators.some(keyword => lowerText.includes(keyword));
+        
+        if (isOrderMessage) {
+            // Create a detailed order from the message
+            createOrderFromMessage(message);
+        }
+    }
+    
+    // Enhanced function to create an order from a message
+    function createOrderFromMessage(message) {
+        // Extract potential cake type using more comprehensive regex
+        const cakeTypes = [
+            'black forest', 'chocolate', 'vanilla', 'strawberry', 
+            'red velvet', 'cheesecake', 'marble', 'fruit', 
+            'pineapple', 'butterscotch', 'coffee', 'mango',
+            'orange', 'lemon', 'blueberry', 'raspberry'
+        ];
+        
+        let cakeType = 'Custom Cake';
+        let foundCakeType = '';
+        
+        for (const type of cakeTypes) {
+            if (message.text.toLowerCase().includes(type)) {
+                foundCakeType = type;
+                cakeType = type.charAt(0).toUpperCase() + type.slice(1) + ' Cake';
+                break;
+            }
+        }
+        
+        // Extract potential quantity using regex
+        const quantityPatterns = [
+            /(\d+)\s*(kg|kilogram|kilograms)/i,
+            /(\d+)\s*(lb|pound|pounds)/i,
+            /(\d+)\s*(gm|gram|grams)/i
+        ];
+        
+        let quantity = 1;
+        let unit = 'kg';
+        
+        for (const pattern of quantityPatterns) {
+            const match = message.text.match(pattern);
+            if (match) {
+                quantity = parseInt(match[1]);
+                unit = match[2].toLowerCase();
+                // Convert to kg if needed
+                if (unit === 'lb' || unit === 'pound' || unit === 'pounds') {
+                    quantity = Math.round(quantity * 0.453592); // Convert lbs to kg
+                } else if (unit === 'gm' || unit === 'gram' || unit === 'grams') {
+                    quantity = Math.round(quantity / 1000); // Convert grams to kg
+                }
+                // Ensure at least 1kg
+                quantity = Math.max(1, quantity);
+                break;
+            }
+        }
+        
+        // Extract potential delivery date
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        let deliveryDate = tomorrow.toISOString().split('T')[0]; // Default to tomorrow
+        
+        // Simple date detection (today, tomorrow, etc.)
+        if (message.text.toLowerCase().includes('today')) {
+            deliveryDate = today.toISOString().split('T')[0];
+        } else if (message.text.toLowerCase().includes('tomorrow')) {
+            deliveryDate = tomorrow.toISOString().split('T')[0];
+        }
+        
+        // Create order object
+        const order = {
+            orderID: 'ORD' + Date.now() + Math.random().toString(36).substr(2, 5),
+            customerInfo: { 
+                name: message.sender,
+                email: '',
+                phone: '',
+                address: '',
+                city: '',
+                pincode: ''
+            },
+            deliveryDate: deliveryDate,
+            deliveryTime: '10:00 AM - 12:00 PM',
+            instructions: message.text,
+            paymentMethod: 'cod',
+            items: [{
+                id: 'cake-' + Date.now() + Math.random().toString(36).substr(2, 5),
+                name: cakeType,
+                price: Math.max(500, quantity * 500), // Minimum ₹500
+                desc: foundCakeType ? `Delicious ${foundCakeType} cake` : 'Custom cake order',
+                img: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200',
+                qty: parseInt(quantity)
+            }],
+            subtotal: Math.max(500, quantity * 500),
+            deliveryCharge: 100,
+            total: Math.max(600, (quantity * 500) + 100),
+            orderDate: new Date().toISOString(),
+            status: 'Pending'
+        };
+        
+        // Save order to storage
+        saveOrder(order);
+        
+        // Update orders display
+        loadOrders();
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return unsafe;
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    
+    // Enhanced function to simulate admin responses
+    function simulateAdminResponse(customerMessage) {
+        // Only simulate if there are customer messages and no recent admin messages
+        if (useFirebase) {
+            chatRef.once('value').then((snapshot) => {
+                const messages = [];
+                snapshot.forEach((childSnapshot) => {
+                    messages.push(childSnapshot.val());
+                });
+                processAdminResponse(messages, customerMessage);
+            });
+        } else {
+            const messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+            processAdminResponse(messages, customerMessage);
+        }
+    }
+    
+    function processAdminResponse(messages, customerMessage) {
+        if (messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+            const oneMinuteAgo = Date.now() - 1 * 60 * 1000;
+            
+            // If last message was from customer and it's been at least 1 minute
+            if (!lastMessage.isAdmin && new Date(lastMessage.timestamp).getTime() < oneMinuteAgo) {
+                // 50% chance to respond
+                if (Math.random() < 0.5) {
+                    const adminResponses = [
+                        "Thanks for your message! We'll prepare your cake as requested.",
+                        "Your order has been received. We'll contact you shortly for confirmation.",
+                        "We can definitely prepare that cake for you. Expect a call for delivery details.",
+                        "Great choice! That cake is one of our specialties.",
+                        "We've noted your request. Our team will prepare your order.",
+                        "Thank you for your order! We'll get started on your cake right away.",
+                        "Perfect! We'll make sure your cake is ready for delivery.",
+                        "Got it! We'll confirm the details with you soon.",
+                        "Thanks for ordering with us! Your cake will be delicious.",
+                        "Order received! We'll reach out if we need any additional details."
+                    ];
+                    
+                    const response = {
+                        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        sender: 'Admin',
+                        isAdmin: true,
+                        text: adminResponses[Math.floor(Math.random() * adminResponses.length)],
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Small delay to simulate human response
+                    setTimeout(() => {
+                        saveMessage(response);
+                        addMessageToUI(response);
+                    }, 2000 + Math.random() * 3000);
+                }
+            }
+        }
+    }
+    
+    // Function to remove a message
+    function removeMessage(messageId) {
+        if (!confirm('Are you sure you want to remove this message?')) {
+            return;
+        }
+        
+        if (useFirebase) {
+            // Find and remove the message from Firebase
+            chatRef.once('value').then((snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const message = childSnapshot.val();
+                    if (message.id === messageId) {
+                        chatRef.child(childSnapshot.key).remove();
+                        return true;
+                    }
+                });
+            });
+        } else {
+            // Remove message from localStorage
+            let messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+            messages = messages.filter(msg => msg.id !== messageId);
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            
+            // Remove message from UI
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.remove();
+            }
+            
+            // Show "no messages" placeholder if no messages left
+            if (messages.length === 0) {
+                noMessagesEl.style.display = 'block';
+            }
+        }
+    }
+});
+</script>
+<script src="scripts.js"></script>
+<script src="user.js"></script>
+<script src="performance.js"></script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SweetHome Delights - User Profile</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="user.css">
+<style>
+    body { font-family: 'Poppins', sans-serif; }
+</style>
+</head>
+<body class="bg-pink-50">
+
+<!-- Navigation -->
+<nav class="bg-pink-600 text-white shadow-lg sticky top-0 z-10">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <i data-feather="home" class="text-pink-200"></i>
+      <a href="index.html" class="text-2xl font-bold">SweetHome Delights</a>
+    </div>
+    <div class="hidden md:flex space-x-6">
+      <a href="index.html" class="hover:text-pink-200 font-medium">Home</a>
+      <a href="menu.html" class="hover:text-pink-200 font-medium">Menu</a>
+      <a href="cart.html" class="hover:text-pink-200 font-medium">Cart</a>
+      <a href="wishlist.html" class="hover:text-pink-200 font-medium">Wishlist</a>
+      <a href="orders.html" class="hover:text-pink-200 font-medium">Orders</a>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="cart.html" class="hover:text-pink-200 relative">
+        <i data-feather="shopping-cart"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+      </a>
+      <a href="wishlist.html" class="hover:text-pink-200 relative">
+        <i data-feather="heart"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="wishlist-count">0</span>
+      </a>
+      <div id="user-profile" class="hover:text-pink-200"></div>
+      <div id="user-menu"></div>
+      <button class="md:hidden focus:outline-none" id="menu-toggle">
+        <i data-feather="menu"></i>
+      </button>
+    </div>
+  </div>
+  <div class="md:hidden hidden bg-pink-700 px-4 py-2" id="mobile-menu">
+    <a href="index.html" class="block py-2 hover:text-pink-200">Home</a>
+    <a href="menu.html" class="block py-2 hover:text-pink-200">Menu</a>
+    <a href="cart.html" class="block py-2 hover:text-pink-200 flex items-center justify-between">
+        <span>Cart</span>
+        <span id="cart-count-mobile-menu" class="text-sm bg-white text-pink-600 rounded-full px-2">0</span>
+    </a>
+    <a href="wishlist.html" class="block py-2 hover:text-pink-200">Wishlist</a>
+    <a href="orders.html" class="block py-2 hover:text-pink-200">Order History</a>
+  </div>
+</nav>
+
+<!-- Profile Header -->
+<section class="py-12 bg-pink-700 text-white">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">My Profile</h1>
+    <p class="text-xl">Manage your account settings and preferences</p>
+  </div>
+</section>
+
+<!-- Profile Content -->
+<section class="py-12">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Profile Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+          <div class="text-center mb-6">
+            <div class="mx-auto bg-pink-100 rounded-full w-24 h-24 flex items-center justify-center mb-4">
+              <i data-feather="user" class="text-pink-600 w-12 h-12"></i>
+            </div>
+            <h3 class="text-xl font-bold text-pink-700" id="profile-username">Username</h3>
+            <p class="text-gray-600">Member since <span id="member-since">-</span></p>
+          </div>
+          
+          <div class="border-t border-gray-200 pt-4">
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="block py-2 px-4 bg-pink-50 text-pink-700 rounded-lg font-medium">
+                  <i data-feather="user" class="w-4 h-4 inline mr-2"></i>Account Details
+                </a>
+              </li>
+              <li>
+                <a href="orders.html" class="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                  <i data-feather="shopping-bag" class="w-4 h-4 inline mr-2"></i>My Orders
+                </a>
+              </li>
+              <li>
+                <a href="wishlist.html" class="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                  <i data-feather="heart" class="w-4 h-4 inline mr-2"></i>Wishlist
+                </a>
+              </li>
+              <li>
+                <a href="cart.html" class="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                  <i data-feather="shopping-cart" class="w-4 h-4 inline mr-2"></i>My Cart
+                </a>
+              </li>
+              <li>
+                <a href="#" id="logout-btn" class="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                  <i data-feather="log-out" class="w-4 h-4 inline mr-2"></i>Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Details -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 class="text-xl font-bold text-pink-700 mb-6">Account Information</h3>
+          
+          <form id="profile-form">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block text-gray-700 mb-2" for="first-name">First Name</label>
+                <input type="text" id="first-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your first name">
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2" for="last-name">Last Name</label>
+                <input type="text" id="last-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your last name">
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2" for="email">Email Address</label>
+              <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your email">
+            </div>
+            
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2" for="phone">Phone Number</label>
+              <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your phone number">
+            </div>
+            
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2" for="address">Delivery Address</label>
+              <textarea id="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your complete address"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block text-gray-700 mb-2" for="city">City</label>
+                <input type="text" id="city" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your city">
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2" for="pincode">Pincode</label>
+                <input type="text" id="pincode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your pincode">
+              </div>
+            </div>
+            
+            <div class="flex justify-end">
+              <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-full">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-xl font-bold text-pink-700 mb-6">Change Password</h3>
+          
+          <form id="password-form">
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2" for="current-password">Current Password</label>
+              <input type="password" id="current-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your current password">
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2" for="new-password">New Password</label>
+              <input type="password" id="new-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your new password">
+            </div>
+            
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2" for="confirm-password">Confirm New Password</label>
+              <input type="password" id="confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Confirm your new password">
+            </div>
+            
+            <div class="flex justify-end">
+              <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-full">
+                Update Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-pink-900 text-white py-8">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">SweetHome Delights</h3>
+        <p>The home of delicious Indian cakes since 2010.</p>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Quick Links</h4>
+        <ul class="space-y-2">
+          <li><a href="index.html" class="hover:text-pink-300">Home</a></li>
+          <li><a href="menu.html" class="hover:text-pink-300">Menu</a></li>
+          <li><a href="cart.html" class="hover:text-pink-300">Cart</a></li>
+          <li><a href="wishlist.html" class="hover:text-pink-300">Wishlist</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Opening Hours</h4>
+        <ul class="space-y-2">
+          <li>Monday - Friday: 9AM - 9PM</li>
+          <li>Saturday - Sunday: 10AM - 10PM</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Payment Methods</h4>
+        <div class="flex space-x-4">
+          <i data-feather="credit-card" class="w-8 h-8"></i>
+          <i data-feather="dollar-sign" class="w-8 h-8"></i>
+          <i data-feather="smartphone" class="w-8 h-8"></i>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-pink-800 mt-8 pt-8 text-center">
+      <p>&copy; 2023 SweetHome Delights. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Initialize all functionality when DOM is loaded and scripts are available
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Initialize feather icons if available
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+    
+    // Update cart count if function is available
+    if (typeof updateCartCount !== 'undefined') {
+        updateCartCount();
+    }
+    
+    // Initialize wishlist if function is available
+    if (typeof initializeWishlist !== 'undefined') {
+        initializeWishlist();
+    }
+    
+    // Add admin link if user is admin
+    if (typeof isAdmin !== 'undefined' && isAdmin()) {
+        // Add to desktop navigation
+        const desktopNav = document.querySelector('.hidden.md\\:flex.space-x-6');
+        if (desktopNav) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin-orders.html';
+            adminLink.className = 'hover:text-pink-200 font-medium';
+            adminLink.textContent = 'Admin Orders';
+            // Insert before the last link (Orders)
+            const lastLink = desktopNav.lastElementChild;
+            if (lastLink) {
+                desktopNav.insertBefore(adminLink, lastLink);
+            } else {
+                desktopNav.appendChild(adminLink);
+            }
+        }
+        
+        // Add to mobile menu
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin-orders.html';
+            adminLink.className = 'block py-2 hover:text-pink-200';
+            adminLink.textContent = 'Admin Orders';
+            // Insert before the last link (Order History)
+            const orderLink = mobileMenu.lastElementChild;
+            if (orderLink) {
+                mobileMenu.insertBefore(adminLink, orderLink);
+            } else {
+                mobileMenu.appendChild(adminLink);
+            }
+        }
+        
+        // Add admin section to profile sidebar
+        const sidebarMenu = document.querySelector('.border-t.border-gray-200.pt-4 ul');
+        if (sidebarMenu) {
+            const adminItem = document.createElement('li');
+            adminItem.innerHTML = `
+                <a href="admin-orders.html" class="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                  <i data-feather="clipboard" class="w-4 h-4 inline mr-2"></i>Admin Orders
+                </a>
+            `;
+            // Insert before the logout button
+            const logoutItem = document.getElementById('logout-btn').closest('li');
+            if (logoutItem) {
+                sidebarMenu.insertBefore(adminItem, logoutItem);
+            } else {
+                sidebarMenu.appendChild(adminItem);
+            }
+        }
+    }
+    
+    // Update profile information
+    updateProfileInfo();
+    
+    // Add event listener for logout button
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof logoutUser !== 'undefined') {
+                logoutUser();
+            }
+        });
+    }
+    
+    // Profile form submission
+    const profileForm = document.getElementById('profile-form');
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Profile information saved successfully!');
+        });
+    }
+    
+    // Password form submission
+    const passwordForm = document.getElementById('password-form');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('New password and confirm password do not match');
+                return;
+            }
+            
+            alert('Password updated successfully!');
+            passwordForm.reset();
+        });
+    }
+});
+
+// Update profile information
+function updateProfileInfo() {
+    if (typeof getCurrentUser !== 'undefined') {
+        const user = getCurrentUser();
+        if (user) {
+            document.getElementById('profile-username').textContent = user.username;
+            document.getElementById('member-since').textContent = new Date(user.loginTime).toLocaleDateString();
+        }
+    }
+}
+</script>
+<script src="scripts.js"></script>
+<script src="user.js"></script>
+<script src="performance.js"></script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sweet Home - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="user.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      font-family: 'Poppins', sans-serif;
+      padding: 20px;
+      position: relative;
+      overflow: auto;
+    }
+
+    /* Animated Background Elements */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -100px;
+      left: -100px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      bottom: -100px;
+      right: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(20px); }
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 50px 60px;
+      text-align: center;
+      width: 100%;
+      max-width: 450px;
+      animation: slideIn 0.8s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo-section {
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .welcome-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      font-weight: 300;
+      margin-bottom: 35px;
+    }
+
+    #heading {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 30px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    #heading::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+
+    .field {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #999;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #999;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-password:hover {
+      color: #667eea;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+
+    .input-field:focus {
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-field:focus + .input-icon {
+      color: #667eea;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      font-family: 'Poppins', sans-serif;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .link {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .link a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .divider::before {
+      margin-right: 10px;
+    }
+
+    .divider::after {
+      margin-left: 10px;
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .remember-forgot label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .remember-forgot input[type="checkbox"] {
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    .remember-forgot a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .remember-forgot a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 40px 30px;
+      }
+
+      .welcome-text {
+        font-size: 26px;
+      }
+
+      #heading {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-section">
+      <div class="logo">🏠🎂</div>
+      <h1 class="welcome-text">Welcome to Sweet Home</h1>
+      <p class="subtitle">Your favorite cake shop awaits</p>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="bg-white/50 backdrop-blur-sm rounded-lg p-2 shadow-lg absolute top-4 right-4 z-10">
+      <a href="index.html" class="flex items-center space-x-2 text-pink-700 hover:text-pink-900 transition-colors">
+        <i data-feather="home" class="w-5 h-5"></i>
+        <span class="font-medium">Home</span>
+      </a>
+    </nav>
+    
+    <p id="heading">Sign In to Your Account</p>
+    
+    <div class="field">
+      <input type="text" id="username" class="input-field" placeholder="Username" required />
+      <span class="input-icon">👤</span>
+    </div>
+    
+    <div class="field">
+      <input type="password" id="password" class="input-field" placeholder="Password" required />
+      <span class="input-icon">🔒</span>
+      <span class="toggle-password" id="togglePassword">👁️</span>
+    </div>
+    
+    <div class="remember-forgot">
+      <label>
+        <input type="checkbox" id="rememberMe" />
+        Remember me
+      </label>
+      <a href="#">Forgot password?</a>
+    </div>
+    
+    <button class="btn" onclick="loginUser()">Login</button>
+    
+    <div class="divider">or</div>
+    
+    <div class="link">
+      <p>Don't have an account? <a href="#" id="register-link" class="create-account-link">Create Account</a></p>
+    </div>
+    
+    <!-- Registration Form (Hidden by default) -->
+    <div id="registration-form" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h3 style="text-align: center; margin-bottom: 20px; color: #333;">Create New Account</h3>
+      <div class="field">
+        <input type="text" id="reg-username" class="input-field" placeholder="Username" required />
+        <span class="input-icon">👤</span>
+      </div>
+      <div class="field">
+        <input type="password" id="reg-password" class="input-field" placeholder="Password" required />
+        <span class="input-icon">🔒</span>
+      </div>
+      <div class="field">
+        <input type="password" id="reg-confirm-password" class="input-field" placeholder="Confirm Password" required />
+        <span class="input-icon">🔒</span>
+      </div>
+      <button class="btn" id="register-btn" style="margin-top: 10px;">Register</button>
+      <button class="btn" id="cancel-register" style="background: #999; margin-top: 10px; margin-left: 10px;">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    function loginUser() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      // Get registered users
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      
+      // Check if it's a registered user
+      const user = users.find(u => u.username === username && u.password === password);
+      
+      // Also check default admin credentials
+      if ((username === "admin" && password === "12345") || user) {
+        // Set user in localStorage
+        localStorage.setItem('loggedIn', 'true');
+        const isAdminUser = username === "admin" || (user && user.isAdmin === true);
+        localStorage.setItem('currentUser', JSON.stringify({
+          username: username,
+          isAdmin: isAdminUser
+        }));
+        
+        // Redirect to index.html inside folder
+        window.location.href = "index.html"; 
+      } else {
+        alert("Invalid username or password!");
+      }
+    }
+    
+    // Password validation function
+    function validatePassword(password) {
+      // Password should be at least 6 characters long
+      if (password.length < 6) {
+        return "Password must be at least 6 characters long";
+      }
+      
+      // Check for at least one letter (uppercase or lowercase)
+      if (!/[a-zA-Z]/.test(password)) {
+        return "Password must contain at least one letter";
+      }
+      
+      // Check for at least 3 digits
+      const digitMatches = password.match(/\d/g);
+      if (!digitMatches || digitMatches.length < 3) {
+        return "Password must contain at least 3 numbers";
+      }
+      
+      return null; // Valid password
+    }
+    
+    // Registration function
+    function registerUser() {
+      const username = document.getElementById("reg-username").value;
+      const password = document.getElementById("reg-password").value;
+      const confirmPassword = document.getElementById("reg-confirm-password").value;
+      
+      // Validation
+      if (!username || !password || !confirmPassword) {
+        alert("Please fill in all fields");
+        return;
+      }
+      
+      // Validate password format
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        alert(passwordError);
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+      
+      // In a real app, you would send this to a server
+      // For now, we'll just store it in localStorage
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      
+      // Check if user already exists
+      if (users.find(user => user.username === username)) {
+        alert("Username already exists");
+        return;
+      }
+      
+      // Add new user
+      users.push({
+        username: username,
+        password: password, // In a real app, this should be hashed
+        isAdmin: false // Default to non-admin
+      });
+      
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      alert("Registration successful! You can now login.");
+      
+      // Hide registration form and show login form
+      document.getElementById("registration-form").style.display = "none";
+      
+      // Clear registration form fields
+      document.getElementById("reg-username").value = "";
+      document.getElementById("reg-password").value = "";
+      document.getElementById("reg-confirm-password").value = "";
+    }
+    
+    // Initialize feather icons and other scripts when available
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof feather !== 'undefined') {
+        feather.replace();
+      }
+      
+      // Update cart count if functions are available
+      if (typeof updateCartCount !== 'undefined') {
+        updateCartCount();
+      }
+      
+      // Initialize wishlist if function is available
+      if (typeof initializeWishlist !== 'undefined') {
+        initializeWishlist();
+      }
+      
+      // Add Enter key support for login
+      const usernameField = document.getElementById("username");
+      const passwordField = document.getElementById("password");
+      const togglePassword = document.getElementById("togglePassword");
+      
+      if (usernameField) {
+        usernameField.addEventListener("keypress", function(e) {
+          if (e.key === "Enter") {
+            loginUser();
+          }
+        });
+      }
+      
+      if (passwordField) {
+        passwordField.addEventListener("keypress", function(e) {
+          if (e.key === "Enter") {
+            loginUser();
+          }
+        });
+      }
+      
+      // Toggle password visibility
+      if (togglePassword) {
+        togglePassword.addEventListener("click", function() {
+          const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+          passwordField.setAttribute("type", type);
+          this.textContent = type === "password" ? "👁️" : "🙈";
+        });
+      }
+      
+      // Registration form toggle
+      const registerLink = document.getElementById("register-link");
+      const cancelRegister = document.getElementById("cancel-register");
+      const registrationForm = document.getElementById("registration-form");
+      const registerBtn = document.getElementById("register-btn");
+      
+      if (registerLink) {
+        registerLink.addEventListener("click", function(e) {
+          e.preventDefault();
+          registrationForm.style.display = "block";
+        });
+      }
+      
+      if (cancelRegister) {
+        cancelRegister.addEventListener("click", function(e) {
+          e.preventDefault();
+          registrationForm.style.display = "none";
+        });
+      }
+      
+      if (registerBtn) {
+        registerBtn.addEventListener("click", function(e) {
+          e.preventDefault();
+          registerUser();
+        });
+      }
+    });
+  </script>
+  <script src="scripts.js"></script>
+  <script src="user.js"></script>
+  <script src="performance.js"></script>
+</body>
+</html>

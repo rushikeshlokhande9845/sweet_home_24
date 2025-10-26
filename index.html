@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SweetHome Delights - Home of Delicious Cakes</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="user.css">
+<style>
+    body { font-family: 'Times New Roman', Times, serif; }
+    .cake-card:hover { transform: scale(1.05); transition: transform 0.3s; }
+</style>
+</head>
+<body class="bg-pink-50">
+
+<!-- RGB Lighting -->
+<div class="fixed top-0 left-0 w-4 h-full rgb-border z-0"></div>
+<div class="fixed top-0 right-0 w-4 h-full rgb-border z-0"></div>
+
+<!-- Navigation -->
+<nav class="bg-pink-600 text-white shadow-lg sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <i data-feather="home" class="text-pink-200"></i>
+            <a href="#" class="text-2xl font-bold">SweetHome Delights</a>
+        </div>
+        <div class="hidden md:flex space-x-6">
+            <a href="#" class="hover:text-pink-200 font-medium">Home</a>
+            <a href="menu.html" class="hover:text-pink-200 font-medium">Menu</a>
+            <a href="cart.html" class="hover:text-pink-200 font-medium">Cart</a>
+            <a href="wishlist.html" class="hover:text-pink-200 font-medium">Wishlist</a>
+            <a href="orders.html" class="hover:text-pink-200 font-medium">Orders</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="cart.html" class="hover:text-pink-200 relative">
+                <i data-feather="shopping-cart"></i>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+            </a>
+            <a href="wishlist.html" class="hover:text-pink-200 relative">
+                <i data-feather="heart"></i>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="wishlist-count">0</span>
+            </a>
+            <div id="user-profile" class="hover:text-pink-200"></div>
+            <div id="user-menu"></div>
+            <button class="md:hidden focus:outline-none" id="menu-toggle">
+                <i data-feather="menu"></i>
+            </button>
+        </div>
+    </div>
+    <div class="md:hidden hidden bg-pink-700 px-4 py-2" id="mobile-menu">
+        <a href="#" class="block py-2 hover:text-pink-200">Home</a>
+        <a href="menu.html" class="block py-2 hover:text-pink-200">Menu</a>
+        <a href="cart.html" class="block py-2 hover:text-pink-200 flex items-center justify-between">
+            <span>Cart</span>
+            <span id="cart-count-mobile-menu" class="text-sm bg-white text-pink-600 rounded-full px-2">0</span>
+        </a>
+        <a href="wishlist.html" class="block py-2 hover:text-pink-200">Wishlist</a>
+        <a href="orders.html" class="block py-2 hover:text-pink-200">Order History</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-40"></div>
+    <img src="https://images.pexels.com/photos/1702373/pexels-photo-1702373.jpeg" alt="Delicious Cakes" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='images/placeholder.jpg';">
+    <div class="absolute text-center text-white px-4 z-10">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4">Welcome to SweetHome Delights</h1>
+        <p class="text-xl md:text-2xl mb-8">The Home of Delicious Indian Cakes</p>
+        <div class="flex flex-col md:flex-row justify-center gap-4">
+            <a href="menu.html" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105">Order Now</a>
+            <a href="menu.html" class="bg-white hover:bg-gray-100 text-pink-600 font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105">Explore Menu</a>
+        </div>
+    </div>
+</section>
+
+<!-- Search Section -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-3xl font-bold text-pink-700 mb-6">Find Your Perfect Cake</h2>
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search for cakes, flavors, or occasions..." class="w-full px-6 py-4 text-lg border-2 border-pink-300 rounded-full focus:outline-none focus:border-pink-600">
+                <button id="search-button" class="absolute right-2 top-2 bg-pink-600 text-white px-6 py-2 rounded-full hover:bg-pink-700 transition">
+                    <i data-feather="search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trending Cakes -->
+<section class="py-16 bg-pink-100" id="menu">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12 text-pink-700">Our Trending Cakes</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- Cake Card 1 -->
+            <div class="cake-card bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="image-placeholder w-full h-64">
+                    <img src="https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg" alt="Birthday Cake" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback w-full h-64 flex items-center justify-center\'><span>Birthday Cake</span></div>';">
+                </div>
+                <div class="p-4 text-center">
+                    <h3 class="text-xl font-bold text-pink-700">Birthday Cake</h3>
+                    <p class="text-gray-600">₹999 | 1 Kg</p>
+                    <p class="text-gray-600">Vanilla & Chocolate Layers</p>
+                    <button onclick="addToCart('cake1', 'Birthday Cake', 999, 'Vanilla & Chocolate Layers', 'https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg')" class="mt-2 inline-block bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">Add to Cart</button>
+                </div>
+            </div>
+
+            <!-- Cake Card 2 -->
+            <div class="cake-card bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="image-placeholder w-full h-64">
+                    <img src="https://images.pexels.com/photos/34321389/pexels-photo-34321389.jpeg" alt="Marble Cake" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback w-full h-64 flex items-center justify-center\'><span>Marble Cake</span></div>';">
+                </div>
+                <div class="p-4 text-center">
+                    <h3 class="text-xl font-bold text-pink-700">Marble Cake</h3>
+                    <p class="text-gray-600">₹799 | 1 Kg</p>
+                    <p class="text-gray-600">Chocolate & Vanilla Swirl</p>
+                    <button onclick="addToCart('cake2', 'Marble Cake', 799, 'Chocolate & Vanilla Swirl', 'https://images.pexels.com/photos/34321389/pexels-photo-34321389.jpeg')" class="mt-2 inline-block bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">Add to Cart</button>
+                </div>
+            </div>
+
+            <!-- Cake Card 3 -->
+            <div class="cake-card bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="image-placeholder w-full h-64">
+                    <img src="https://media.istockphoto.com/id/184599041/photo/chocolate-and-orange-cake.jpg?s=1024x1024&w=is&k=20&c=fX7aMjt1SI6z3D8Pox_7SZ39iVT35LHwwfzwQidIuVU=" alt="Chocolate Cake" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback w-full h-64 flex items-center justify-center\'><span>Chocolate Cake</span></div>';">
+                </div>
+                <div class="p-4 text-center">
+                    <h3 class="text-xl font-bold text-pink-700">Chocolate Cake</h3>
+                    <p class="text-gray-600">₹899 | 1 Kg</p>
+                    <p class="text-gray-600">Rich Chocolate Layers</p>
+                    <button onclick="addToCart('cake3', 'Chocolate Cake', 899, 'Rich Chocolate Layers', 'https://media.istockphoto.com/id/184599041/photo/chocolate-and-orange-cake.jpg?s=1024x1024&w=is&k=20&c=fX7aMjt1SI6z3D8Pox_7SZ39iVT35LHwwfzwQidIuVU=')" class="mt-2 inline-block bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">Add to Cart</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center mt-12">
+            <a href="menu.html" class="inline-block bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 transform hover:scale-105">View Full Menu</a>
+        </div>
+    </div>
+</section>
+
+<!-- About Us Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="image-placeholder rounded-lg shadow-lg w-full h-64">
+                    <img src="https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=600" alt="Our Kitchen" class="rounded-lg shadow-lg w-full h-64 object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback w-full h-64 flex items-center justify-center rounded-lg\'><span>Our Kitchen</span></div>';">
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-pink-700 mb-6">About SweetHome Delights</h2>
+                <p class="text-gray-700 mb-4">
+                    Since 2010, SweetHome Delights has been crafting the finest cakes with love and passion. Our expert bakers use only the freshest ingredients to create memorable moments for your special occasions.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    From classic favorites to innovative creations, every cake is baked fresh to order and delivered with care to your doorstep.
+                </p>
+                <div class="grid grid-cols-3 gap-4 mt-8">
+                    <div class="text-center">
+                        <h3 class="text-3xl font-bold text-pink-600">500+</h3>
+                        <p class="text-gray-600">Happy Customers</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-3xl font-bold text-pink-600">50+</h3>
+                        <p class="text-gray-600">Cake Varieties</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-3xl font-bold text-pink-600">13+</h3>
+                        <p class="text-gray-600">Years Experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-16 bg-pink-100" id="testimonials">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12 text-pink-700">What Our Customers Say</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-500">
+                        ★★★★★
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">"The chocolate truffle cake was absolutely divine! Fresh, moist, and beautifully decorated. Will order again!"</p>
+                <p class="font-bold text-pink-700">- Priya Sharma</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-500">
+                        ★★★★★
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">"Best cake shop in town! Ordered a red velvet for my daughter's birthday and everyone loved it. Highly recommended!"</p>
+                <p class="font-bold text-pink-700">- Raj Patel</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-500">
+                        ★★★★★
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">"Amazing quality and timely delivery. The strawberry delight was a hit at our party. Thank you SweetHome Delights!"</p>
+                <p class="font-bold text-pink-700">- Anita Desai</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-16 bg-white" id="contact">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12 text-pink-700">Contact Us</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <h3 class="text-xl font-bold text-pink-700 mb-4">Get In Touch</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <i data-feather="map-pin" class="text-pink-600 mr-3"></i>
+                        <p>123 Cake Street, Sweet City, India - 400001</p>
+                    </div>
+                    <div class="flex items-center">
+                        <i data-feather="phone" class="text-pink-600 mr-3"></i>
+                        <p>+91 98765 43210</p>
+                    </div>
+                    <div class="flex items-center">
+                        <i data-feather="mail" class="text-pink-600 mr-3"></i>
+                        <p>info@sweethomedelights.com</p>
+                    </div>
+                    <div class="flex items-center">
+                        <i data-feather="clock" class="text-pink-600 mr-3"></i>
+                        <p>Mon-Fri: 9AM-9PM | Sat-Sun: 10AM-10PM</p>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h4 class="font-bold mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white hover:bg-pink-700">
+                            <i data-feather="facebook"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white hover:bg-pink-700">
+                            <i data-feather="instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white hover:bg-pink-700">
+                            <i data-feather="twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-pink-700 mb-4">Send Us a Message</h3>
+                <form class="space-y-4">
+                    <input type="text" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <input type="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    <textarea placeholder="Your Message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"></textarea>
+                    <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-full">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-pink-900 text-white py-8">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">SweetHome Delights</h3>
+                <p>The home of delicious Indian cakes since 2010.</p>
+                <p class="mt-2 text-sm">© 2024 SweetHome Delights. All rights reserved.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Quick Links</h4>
+                <ul class="space-y-2">
+                    <li><a href="index.html" class="hover:text-pink-300">Home</a></li>
+                    <li><a href="menu.html" class="hover:text-pink-300">Menu</a></li>
+                    <li><a href="#about" class="hover:text-pink-300">About Us</a></li>
+                    <li><a href="#contact" class="hover:text-pink-300">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Categories</h4>
+                <ul class="space-y-2">
+                    <li><a href="menu.html" class="hover:text-pink-300">Chocolate Cakes</a></li>
+                    <li><a href="menu.html" class="hover:text-pink-300">Fruit Cakes</a></li>
+                    <li><a href="menu.html" class="hover:text-pink-300">Cheesecakes</a></li>
+                    <li><a href="menu.html" class="hover:text-pink-300">Special Occasions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Payment Methods</h4>
+                <div class="flex space-x-4 mb-4">
+                    <i data-feather="credit-card" class="w-8 h-8"></i>
+                    <i data-feather="dollar-sign" class="w-8 h-8"></i>
+                    <i data-feather="smartphone" class="w-8 h-8"></i>
+                </div>
+                <p class="text-sm">We accept all major payment methods</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Initialize all functionality when DOM is loaded and scripts are available
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Initialize feather icons if available
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+        
+        // Update cart count if function is available
+        if (typeof updateCartCount !== 'undefined') {
+            updateCartCount();
+        }
+        
+        // Initialize wishlist if function is available
+        if (typeof initializeWishlist !== 'undefined') {
+            initializeWishlist();
+        }
+        
+        // Add admin link if user is admin
+        if (typeof isAdmin !== 'undefined' && isAdmin()) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                const adminLink = document.createElement('a');
+                adminLink.href = 'admin-orders.html';
+                adminLink.className = 'block py-2 hover:text-pink-200';
+                adminLink.textContent = 'Admin Orders';
+                mobileMenu.appendChild(adminLink);
+            }
+        }
+        
+        // Add to Cart Function
+        window.addToCart = function(id, name, price, desc, img) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.qty++;
+            } else {
+                cart.push({ id, name, price, desc, img, qty: 1 });
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart count
+            if (typeof updateCartCount !== 'undefined') {
+                updateCartCount();
+            }
+            
+            // Show success message
+            if (typeof showNotification !== 'undefined') {
+                showNotification(`${name} added to cart!`, 'success');
+            } else {
+                alert(`${name} added to cart!`);
+            }
+        };
+    });
+</script>
+<script src="scripts.js"></script>
+<script src="user.js"></script>
+<script src="performance.js"></script>
+</body>
+</html>

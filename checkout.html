@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SweetHome Delights - Checkout</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="user.css">
+    <style>
+        .payment-method {
+            transition: all 0.3s ease;
+        }
+        .payment-method:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .payment-method.selected {
+            border-color: #db2777;
+            background-color: #fdf2f8;
+        }
+    </style>
+</head>
+<body class="font-poppins bg-pink-50">
+    <!-- RGB Lighting Effect -->
+    <div class="fixed top-0 left-0 w-4 h-full rgb-border z-0"></div>
+    <div class="fixed top-0 right-0 w-4 h-full rgb-border z-0"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-pink-600 text-white shadow-lg sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i data-feather="home" class="text-pink-200"></i>
+                <a href="index.html" class="text-2xl font-bold">SweetHome Delights</a>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html" class="hover:text-pink-200 font-medium">Home</a>
+                <a href="menu.html" class="hover:text-pink-200 font-medium">Menu</a>
+                <a href="cart.html" class="hover:text-pink-200 font-medium">Cart</a>
+                <a href="wishlist.html" class="hover:text-pink-200 font-medium">Wishlist</a>
+                <a href="orders.html" class="hover:text-pink-200 font-medium">Orders</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="cart.html" class="hover:text-pink-200 relative">
+                    <i data-feather="shopping-cart"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+                </a>
+                <a href="wishlist.html" class="hover:text-pink-200 relative">
+                    <i data-feather="heart"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="wishlist-count">0</span>
+                </a>
+                <div id="user-profile" class="hover:text-pink-200"></div>
+                <div id="user-menu"></div>
+                <button class="md:hidden focus:outline-none" id="menu-toggle">
+                    <i data-feather="menu"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden bg-pink-700 px-4 py-2" id="mobile-menu">
+            <a href="index.html" class="block py-2 hover:text-pink-200">Home</a>
+            <a href="menu.html" class="block py-2 hover:text-pink-200">Menu</a>
+            <a href="cart.html" class="block py-2 hover:text-pink-200">Cart</a>
+            <a href="wishlist.html" class="block py-2 hover:text-pink-200">Wishlist</a>
+            <a href="orders.html" class="block py-2 hover:text-pink-200">Order History</a>
+            <a href="index.html#contact" class="block py-2 hover:text-pink-200">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Checkout Header -->
+    <section class="py-12 bg-pink-700 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Checkout</h1>
+            <p class="text-xl">Complete your order with these simple steps</p>
+        </div>
+    </section>
+
+    <!-- Checkout Steps -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold">1</div>
+                        <div class="ml-2 text-pink-600 font-medium">Delivery Info</div>
+                    </div>
+                    <div class="h-1 w-16 bg-gray-300 mx-2 hidden md:block"></div>
+                    <div class="flex items-center mt-4 md:mt-0">
+                        <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">2</div>
+                        <div class="ml-2 text-gray-500">Payment</div>
+                    </div>
+                    <div class="h-1 w-16 bg-gray-300 mx-2 hidden md:block"></div>
+                    <div class="flex items-center mt-4 md:mt-0">
+                        <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">3</div>
+                        <div class="ml-2 text-gray-500">Confirmation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Content -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Delivery Form -->
+                <div>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h3 class="text-xl font-bold text-pink-700 mb-6">Delivery Information</h3>
+                        
+                        <form>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="name">Full Name</label>
+                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your full name">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="email">Email Address</label>
+                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your email">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="phone">Phone Number</label>
+                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your phone number">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="address">Delivery Address</label>
+                                <textarea id="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your complete address"></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2" for="city">City</label>
+                                    <input type="text" id="city" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your city">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2" for="pincode">Pincode</label>
+                                    <input type="text" id="pincode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Enter your pincode">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2" for="instructions">Delivery Instructions (Optional)</label>
+                                <textarea id="instructions" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Any special instructions for delivery"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-bold text-pink-700 mb-6">Delivery Date & Time</h3>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="delivery-date">Delivery Date</label>
+                            <input type="date" id="delivery-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="delivery-time">Delivery Time Slot</label>
+                            <select id="delivery-time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                <option>10:00 AM - 12:00 PM</option>
+                                <option>12:00 PM - 02:00 PM</option>
+                                <option>02:00 PM - 04:00 PM</option>
+                                <option>04:00 PM - 06:00 PM</option>
+                                <option>06:00 PM - 08:00 PM</option>
+                                <option>08:00 PM - 10:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div>
+                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                        <h3 class="text-xl font-bold text-pink-700 mb-6">Order Summary</h3>
+                        
+                        <!-- Cart Items Preview -->
+                        <div id="order-items" class="mb-6 max-h-64 overflow-y-auto">
+                            <!-- Cart items will be rendered here -->
+                        </div>
+                        
+                        <div class="space-y-4 mb-6 border-t pt-4">
+                            <div class="flex justify-between">
+                                <span>Subtotal (<span id="item-count">0</span> items)</span>
+                                <span id="subtotal">₹0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Delivery Charges</span>
+                                <span id="delivery">₹100</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Discount</span>
+                                <span id="discount" class="text-green-600">₹0</span>
+                            </div>
+                            <div class="flex justify-between border-t border-gray-200 pt-4">
+                                <span class="font-bold">Total</span>
+                                <span id="total" class="font-bold text-pink-700 text-xl">₹0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-bold mb-4">Payment Method</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="payment-method border border-gray-300 rounded-lg p-4 cursor-pointer" data-payment="card">
+                                    <div class="flex items-center">
+                                        <i data-feather="credit-card" class="mr-2 text-pink-600"></i>
+                                        <span>Credit/Debit Card</span>
+                                    </div>
+                                </div>
+                                <div class="payment-method border border-gray-300 rounded-lg p-4 cursor-pointer" data-payment="upi">
+                                    <div class="flex items-center">
+                                        <i data-feather="smartphone" class="mr-2 text-pink-600"></i>
+                                        <span>UPI Payment</span>
+                                    </div>
+                                </div>
+                                <div class="payment-method border border-gray-300 rounded-lg p-4 cursor-pointer" data-payment="netbanking">
+                                    <div class="flex items-center">
+                                        <i data-feather="dollar-sign" class="mr-2 text-pink-600"></i>
+                                        <span>Net Banking</span>
+                                    </div>
+                                </div>
+                                <div class="payment-method border border-gray-300 rounded-lg p-4 cursor-pointer" data-payment="cod">
+                                    <div class="flex items-center">
+                                        <i data-feather="box" class="mr-2 text-pink-600"></i>
+                                        <span>Cash on Delivery</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="terms" class="mr-2">
+                                <label for="terms" class="text-sm">I agree to the <a href="#" class="text-pink-600">Terms & Conditions</a></label>
+                            </div>
+                        </div>
+                        
+                        <button id="place-order-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-6 rounded-full transition">
+                            Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-pink-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">SweetHome Delights</h3>
+                    <p>The home of delicious Indian cakes since 2010.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="hover:text-pink-300">Home</a></li>
+                        <li><a href="menu.html" class="hover:text-pink-300">Menu</a></li>
+                        <li><a href="index.html#offers" class="hover:text-pink-300">Offers</a></li>
+                        <li><a href="index.html#testimonials" class="hover:text-pink-300">Testimonials</a></li>
+                        <li><a href="index.html#contact" class="hover:text-pink-300">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Opening Hours</h4>
+                    <ul class="space-y-2">
+                        <li>Monday - Friday: 9AM - 9PM</li>
+                        <li>Saturday - Sunday: 10AM - 10PM</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Payment Methods</h4>
+                    <div class="flex space-x-4">
+                        <i data-feather="credit-card" class="w-8 h-8"></i>
+                        <i data-feather="dollar-sign" class="w-8 h-8"></i>
+                        <i data-feather="smartphone" class="w-8 h-8"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-pink-800 mt-8 pt-8 text-center">
+                <p>&copy; 2023 SweetHome Delights. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize all functionality when DOM is loaded and scripts are available
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (menuToggle && mobileMenu) {
+                menuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Initialize feather icons if available
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+            
+            // Update cart count if function is available
+            if (typeof updateCartCount !== 'undefined') {
+                updateCartCount();
+            }
+            
+            // Initialize wishlist if function is available
+            if (typeof initializeWishlist !== 'undefined') {
+                initializeWishlist();
+            }
+            
+            // Global variables
+            let cartData = [];
+            let selectedPaymentMethod = null;
+            const deliveryCharge = 100;
+
+            // Load cart data
+            function loadCart() {
+                cartData = JSON.parse(localStorage.getItem('cart')) || [];
+                
+                if (cartData.length === 0) {
+                    alert('Your cart is empty! Redirecting to menu...');
+                    window.location.href = 'menu.html';
+                    return;
+                }
+                
+                renderOrderItems();
+                updateOrderSummary();
+                setMinDate();
+            }
+
+            // Render cart items in order summary
+            function renderOrderItems() {
+                const orderItemsEl = document.getElementById('order-items');
+                if (!orderItemsEl) return;
+                
+                orderItemsEl.innerHTML = '';
+                
+                cartData.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'cart-item-mini flex items-center mb-3 p-2 rounded';
+                    itemEl.innerHTML = `
+                        <div class="image-placeholder w-16 h-16 rounded mr-3">
+                            <img src="${item.img}" alt="${item.name}" class="w-16 h-16 object-cover rounded" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback w-16 h-16 flex items-center justify-center rounded\'><span class=\'text-xs\'>${item.name}</span></div>';">
+                        </div>
+                        <div class="flex-1">
+                            <h5 class="text-sm font-bold text-gray-700">${item.name}</h5>
+                            <p class="text-xs text-gray-500">Qty: ${item.qty} × ₹${item.price}</p>
+                        </div>
+                        <p class="text-sm font-bold text-pink-700">₹${item.qty * item.price}</p>
+                    `;
+                    orderItemsEl.appendChild(itemEl);
+                });
+            }
+
+            // Update order summary calculations
+            function updateOrderSummary() {
+                const subtotal = cartData.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                const totalItems = cartData.reduce((acc, item) => acc + item.qty, 0);
+                const discount = 0; // Can be implemented later
+                const total = subtotal + deliveryCharge - discount;
+                
+                const itemCountEl = document.getElementById('item-count');
+                const subtotalEl = document.getElementById('subtotal');
+                const deliveryEl = document.getElementById('delivery');
+                const discountEl = document.getElementById('discount');
+                const totalEl = document.getElementById('total');
+                
+                if (itemCountEl) itemCountEl.textContent = totalItems;
+                if (subtotalEl) subtotalEl.textContent = `₹${subtotal}`;
+                if (deliveryEl) deliveryEl.textContent = `₹${deliveryCharge}`;
+                if (discountEl) discountEl.textContent = discount > 0 ? `-₹${discount}` : '₹0';
+                if (totalEl) totalEl.textContent = `₹${total}`;
+            }
+
+            // Set minimum delivery date to tomorrow
+            function setMinDate() {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const minDate = tomorrow.toISOString().split('T')[0];
+                const deliveryDateInput = document.getElementById('delivery-date');
+                if (deliveryDateInput) {
+                    deliveryDateInput.setAttribute('min', minDate);
+                }
+            }
+
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            if (paymentMethods.length > 0) {
+                paymentMethods.forEach(method => {
+                    method.addEventListener('click', function() {
+                        paymentMethods.forEach(m => m.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedPaymentMethod = this.getAttribute('data-payment');
+                    });
+                });
+            }
+
+            // Form validation and order placement
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            if (placeOrderBtn) {
+                placeOrderBtn.addEventListener('click', function() {
+                    // Validate delivery information
+                    const nameInput = document.getElementById('name');
+                    const emailInput = document.getElementById('email');
+                    const phoneInput = document.getElementById('phone');
+                    const addressInput = document.getElementById('address');
+                    const cityInput = document.getElementById('city');
+                    const pincodeInput = document.getElementById('pincode');
+                    const deliveryDateInput = document.getElementById('delivery-date');
+                    const deliveryTimeInput = document.getElementById('delivery-time');
+                    const instructionsInput = document.getElementById('instructions');
+                    const termsCheckbox = document.getElementById('terms');
+
+                    if (!nameInput || !emailInput || !phoneInput || !addressInput || !cityInput || !pincodeInput || !deliveryDateInput || !deliveryTimeInput || !termsCheckbox) {
+                        alert('Required form elements not found');
+                        return;
+                    }
+
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+                    const phone = phoneInput.value.trim();
+                    const address = addressInput.value.trim();
+                    const city = cityInput.value.trim();
+                    const pincode = pincodeInput.value.trim();
+                    const deliveryDate = deliveryDateInput.value;
+                    const deliveryTime = deliveryTimeInput.value;
+                    const instructions = instructionsInput.value.trim();
+                    const terms = termsCheckbox.checked;
+
+                    // Validation checks
+                    if (!name) {
+                        alert('Please enter your full name');
+                        nameInput.focus();
+                        return;
+                    }
+
+                    if (!email || !email.includes('@')) {
+                        alert('Please enter a valid email address');
+                        emailInput.focus();
+                        return;
+                    }
+
+                    if (!phone || phone.length !== 10 || !/^[0-9]+$/.test(phone)) {
+                        alert('Please enter a valid 10-digit phone number');
+                        phoneInput.focus();
+                        return;
+                    }
+
+                    if (!address) {
+                        alert('Please enter your delivery address');
+                        addressInput.focus();
+                        return;
+                    }
+
+                    if (!city) {
+                        alert('Please enter your city');
+                        cityInput.focus();
+                        return;
+                    }
+
+                    if (!pincode || pincode.length !== 6 || !/^[0-9]+$/.test(pincode)) {
+                        alert('Please enter a valid 6-digit pincode');
+                        pincodeInput.focus();
+                        return;
+                    }
+
+                    if (!deliveryDate) {
+                        alert('Please select a delivery date');
+                        deliveryDateInput.focus();
+                        return;
+                    }
+
+                    if (!deliveryTime) {
+                        alert('Please select a delivery time slot');
+                        deliveryTimeInput.focus();
+                        return;
+                    }
+
+                    if (!selectedPaymentMethod) {
+                        alert('Please select a payment method');
+                        return;
+                    }
+
+                    if (!terms) {
+                        alert('Please accept the Terms & Conditions');
+                        return;
+                    }
+
+                    // Disable button to prevent double submission
+                    placeOrderBtn.disabled = true;
+                    placeOrderBtn.textContent = 'Processing...';
+
+                    // Create order object
+                    const orderData = {
+                        orderID: 'ORD' + Date.now(),
+                        customerInfo: { name, email, phone, address, city, pincode },
+                        deliveryDate,
+                        deliveryTime,
+                        instructions: instructions || '',
+                        paymentMethod: selectedPaymentMethod,
+                        items: cartData,
+                        subtotal: cartData.reduce((acc, item) => acc + (item.price * item.qty), 0),
+                        deliveryCharge,
+                        total: cartData.reduce((acc, item) => acc + (item.price * item.qty), 0) + deliveryCharge,
+                        orderDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+                        status: 'Pending'
+                    };
+
+                    // Send order to backend API
+                    fetch('http://localhost:3000/api/orders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Save order to localStorage for order history
+                            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+                            orders.push(orderData);
+                            localStorage.setItem('orders', JSON.stringify(orders));
+
+                            // Clear cart
+                            localStorage.removeItem('cart');
+
+                            // Notify admins of new order
+                            localStorage.setItem('newOrderNotification', JSON.stringify({
+                                orderId: data.orderId,
+                                timestamp: Date.now()
+                            }));
+
+                            // Redirect to orders page with success message
+                            console.log('Redirecting to orders.html with success params');
+                            window.location.href = `orders.html?orderSuccess=true&orderId=${data.orderId}`;
+                        } else {
+                            // Re-enable button on error
+                            placeOrderBtn.disabled = false;
+                            placeOrderBtn.textContent = 'Place Order';
+                            
+                            alert('❌ Error placing order: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        
+                        // Re-enable button on error
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.textContent = 'Place Order';
+                        
+                        // Save order to localStorage anyway without showing backend error
+                        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+                        orders.push(orderData);
+                        localStorage.setItem('orders', JSON.stringify(orders));
+                        
+                        // Clear cart
+                        localStorage.removeItem('cart');
+                        
+                        // Notify admins of new order
+                        localStorage.setItem('newOrderNotification', JSON.stringify({
+                            orderId: orderData.orderID,
+                            timestamp: Date.now()
+                        }));
+
+                        // Show success message and redirect
+                        alert('Order placed successfully!');
+                        window.location.href = `orders.html?orderSuccess=true&orderId=${orderData.orderID}`;
+                    });
+                });
+            }
+
+            // Initialize on page load
+            loadCart();
+            
+            // Reinitialize feather icons
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
+    <script src="scripts.js"></script>
+    <script src="user.js"></script>
+    <script src="performance.js"></script>
+</body>
+</html>

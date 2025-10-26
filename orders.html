@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SweetHome Delights - Order History</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="user.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="api.js"></script>
+    <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .order-item:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    
+    /* Order success message animation */
+    #order-success-message {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Real-time indicator */
+    .real-time-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #10b981;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none;
+    }
+    
+    .real-time-indicator.syncing {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .sync-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body class="bg-pink-50">
+
+<!-- Real-time sync indicator -->
+<div class="real-time-indicator" id="sync-indicator">
+    <div class="sync-spinner"></div>
+    <span>Syncing...</span>
+</div>
+
+<!-- Navigation -->
+<nav class="bg-pink-600 text-white shadow-lg sticky top-0 z-10">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <i data-feather="home" class="text-pink-200"></i>
+      <a href="index.html" class="text-2xl font-bold">SweetHome Delights</a>
+    </div>
+    <div class="hidden md:flex space-x-6">
+      <a href="index.html" class="hover:text-pink-200 font-medium">Home</a>
+      <a href="menu.html" class="hover:text-pink-200 font-medium">Menu</a>
+      <a href="cart.html" class="hover:text-pink-200 font-medium">Cart</a>
+      <a href="wishlist.html" class="hover:text-pink-200 font-medium">Wishlist</a>
+      <a href="chat.html" class="hover:text-pink-200 font-medium">Live Chat</a>
+      <a href="#" class="font-medium bg-pink-700 text-white px-4 py-2 rounded-full">Orders</a>
+    </div>
+    <div class="flex items-center space-x-4">
+      <a href="cart.html" class="hover:text-pink-200 relative">
+        <i data-feather="shopping-cart"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">0</span>
+      </a>
+      <a href="wishlist.html" class="hover:text-pink-200 relative">
+        <i data-feather="heart"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="wishlist-count">0</span>
+      </a>
+      <div id="user-profile" class="hover:text-pink-200"></div>
+      <div id="user-menu"></div>
+      <button class="md:hidden focus:outline-none" id="menu-toggle">
+        <i data-feather="menu"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile Menu -->
+  <div class="md:hidden hidden bg-pink-700 px-4 py-2" id="mobile-menu">
+    <a href="index.html" class="block py-2 hover:text-pink-200">Home</a>
+    <a href="menu.html" class="block py-2 hover:text-pink-200">Menu</a>
+    <a href="cart.html" class="block py-2 hover:text-pink-200 flex items-center justify-between">
+        <span>Cart</span>
+        <span id="cart-count-mobile-menu" class="text-sm bg-white text-pink-600 rounded-full px-2">0</span>
+    </a>
+    <a href="wishlist.html" class="block py-2 hover:text-pink-200">Wishlist</a>
+    <a href="chat.html" class="block py-2 hover:text-pink-200">Live Chat</a>
+    <a href="#" class="block py-2 hover:text-pink-200 text-pink-200">Order History</a>
+    <a href="index.html#contact" class="block py-2 hover:text-pink-200">Contact</a>
+  </div>
+</nav>
+
+<!-- Orders Header -->
+<section class="py-12 bg-pink-700 text-white">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Order History</h1>
+    <p class="text-xl">Your past orders and details</p>
+  </div>
+</section>
+
+<!-- Order Success Message (Hidden by default) -->
+<div id="order-success-message" class="hidden py-4 bg-green-100 border border-green-400 text-green-700 px-4 rounded-lg mb-6 container mx-auto px-4">
+  <div class="flex items-center">
+    <i data-feather="check-circle" class="mr-2 text-green-600"></i>
+    <span id="success-message-text" class="font-medium">Order placed successfully!</span>
+  </div>
+</div>
+
+<!-- Orders Content -->
+<section class="py-12">
+  <div class="container mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden" id="orders-container">
+      <p class="text-center text-gray-400 py-10" id="empty-msg">No orders found. Place your first order!</p>
+      <div id="orders-list"></div>
+    </div>
+    <!-- Continue Shopping -->
+    <div class="mt-6">
+      <a href="menu.html" class="inline-flex items-center text-pink-600 hover:text-pink-800">
+        <i data-feather="arrow-left" class="mr-2"></i>
+        Continue Shopping
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-pink-900 text-white py-8">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">SweetHome Delights</h3>
+        <p>The home of delicious Indian cakes since 2010.</p>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Quick Links</h4>
+        <ul class="space-y-2">
+          <li><a href="index.html" class="hover:text-pink-300">Home</a></li>
+          <li><a href="menu.html" class="hover:text-pink-300">Menu</a></li>
+          <li><a href="cart.html" class="hover:text-pink-300">Cart</a></li>
+          <li><a href="wishlist.html" class="hover:text-pink-300">Wishlist</a></li>
+          <li><a href="orders.html" class="hover:text-pink-300">Order History</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Opening Hours</h4>
+        <ul class="space-y-2">
+          <li>Monday - Friday: 9AM - 9PM</li>
+          <li>Saturday - Sunday: 10AM - 10PM</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4">Payment Methods</h4>
+        <div class="flex space-x-4">
+          <i data-feather="credit-card" class="w-8 h-8"></i>
+          <i data-feather="dollar-sign" class="w-8 h-8"></i>
+          <i data-feather="smartphone" class="w-8 h-8"></i>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-pink-800 mt-8 pt-8 text-center">
+      <p>&copy; 2023 SweetHome Delights. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Initialize all functionality when DOM is loaded and scripts are available
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Initialize feather icons if available
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+    
+    // Update cart count if function is available
+    if (typeof updateCartCount !== 'undefined') {
+        updateCartCount();
+    }
+    
+    // Initialize wishlist if function is available
+    if (typeof initializeWishlist !== 'undefined') {
+        initializeWishlist();
+    }
+    
+    // Check for order success message in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderSuccess = urlParams.get('orderSuccess');
+    const orderId = urlParams.get('orderId');
+    
+    // Debug logging
+    console.log('Full URL:', window.location.href);
+    console.log('Search string:', window.location.search);
+    console.log('URL Params object:', urlParams);
+    console.log('orderSuccess:', orderSuccess);
+    console.log('orderId:', orderId);
+    
+    // Manual test for URL parameters
+    if (window.location.search.includes('orderSuccess=true')) {
+        console.log('Manual check: orderSuccess=true found in URL');
+    }
+    if (window.location.search.includes('orderId=')) {
+        console.log('Manual check: orderId found in URL');
+    }
+    
+    // Show success message if order was just placed
+    if (orderSuccess === 'true' && orderId) {
+        // Wait a bit for DOM to be fully ready
+        setTimeout(function() {
+            const successMessageEl = document.getElementById('order-success-message') || document.querySelector('#order-success-message');
+            const successMessageTextEl = document.getElementById('success-message-text') || document.querySelector('#success-message-text');
+            
+            if (successMessageEl && successMessageTextEl) {
+                successMessageTextEl.textContent = `Order #${orderId} placed successfully! Thank you for your purchase.`;
+                successMessageEl.classList.remove('hidden');
+                
+                // Initialize feather icons for the success message
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+                
+                // Hide the message after 5 seconds
+                setTimeout(() => {
+                    successMessageEl.classList.add('hidden');
+                    // Remove URL parameters after showing message
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 5000);
+            }
+        }, 100);
+    }
+    
+    // Add admin link if user is admin
+    if (typeof isAdmin !== 'undefined' && isAdmin()) {
+        // Add to desktop navigation
+        const desktopNav = document.querySelector('.hidden.md\\:flex.space-x-6');
+        if (desktopNav) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin-orders.html';
+            adminLink.className = 'hover:text-pink-200 font-medium';
+            adminLink.textContent = 'Admin Orders';
+            // Insert before the last link (Orders)
+            const lastLink = desktopNav.lastElementChild;
+            if (lastLink) {
+                desktopNav.insertBefore(adminLink, lastLink);
+            } else {
+                desktopNav.appendChild(adminLink);
+            }
+        }
+        
+        // Add to mobile menu
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin-orders.html';
+            adminLink.className = 'block py-2 hover:text-pink-200';
+            adminLink.textContent = 'Admin Orders';
+            // Insert before the last link (Contact)
+            const contactLink = mobileMenu.lastElementChild;
+            if (contactLink) {
+                mobileMenu.insertBefore(adminLink, contactLink);
+            } else {
+                mobileMenu.appendChild(adminLink);
+            }
+        }
+    }
+    
+    // Order history functionality
+    let ordersData = JSON.parse(localStorage.getItem('orders')) || [];
+    const ordersContainerEl = document.getElementById('orders-container');
+    const emptyMsgEl = document.getElementById('empty-msg');
+    const ordersListEl = document.getElementById('orders-list');
+    const syncIndicator = document.getElementById('sync-indicator');
+    
+    // Check if Firebase is available
+    const useFirebase = typeof firebase !== 'undefined' && typeof ordersRef !== 'undefined';
+    
+    // Check if required elements exist
+    if (!ordersContainerEl || !emptyMsgEl || !ordersListEl) {
+        console.error('Required order elements not found');
+        return;
+    }
+
+    // Set up real-time updates
+    setupRealTimeUpdates();
+    
+    function setupRealTimeUpdates() {
+        if (useFirebase) {
+            // Use Firebase for real-time updates
+            ordersRef.on('child_added', (snapshot) => {
+                showSyncIndicator();
+                loadOrders();
+            });
+            
+            ordersRef.on('child_changed', (snapshot) => {
+                showSyncIndicator();
+                loadOrders();
+            });
+        } else {
+            // Listen for localStorage changes
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'orders') {
+                    showSyncIndicator();
+                    ordersData = JSON.parse(localStorage.getItem('orders')) || [];
+                    renderOrders();
+                }
+            });
+            
+            // Also check for changes every 2 seconds (for same-tab updates)
+            setInterval(() => {
+                const storedOrders = localStorage.getItem('orders');
+                if (storedOrders) {
+                    const orders = JSON.parse(storedOrders);
+                    if (JSON.stringify(orders) !== JSON.stringify(ordersData)) {
+                        ordersData = orders;
+                        renderOrders();
+                    }
+                }
+            }, 2000);
+        }
+    }
+    
+    // Function to show sync indicator
+    function showSyncIndicator() {
+        syncIndicator.classList.add('syncing');
+        setTimeout(() => {
+            syncIndicator.classList.remove('syncing');
+        }, 1000);
+    }
+    
+    // Function to load orders from storage
+    function loadOrders() {
+        if (useFirebase) {
+            ordersRef.once('value').then((snapshot) => {
+                ordersData = [];
+                snapshot.forEach((childSnapshot) => {
+                    ordersData.push(childSnapshot.val());
+                });
+                renderOrders();
+            });
+        } else {
+            ordersData = JSON.parse(localStorage.getItem('orders')) || [];
+            renderOrders();
+        }
+    }
+    
+    // Function to update order status
+    function updateOrderStatus(orderId, status) {
+        if (useFirebase) {
+            // Find the order in Firebase and update its status
+            ordersRef.once('value').then((snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const order = childSnapshot.val();
+                    if (order.orderID === orderId) {
+                        const updatedOrder = { ...order, status: status };
+                        ordersRef.child(childSnapshot.key).set(updatedOrder);
+                        return true;
+                    }
+                });
+            });
+        } else {
+            // Find the order in the orders array
+            const orderIndex = ordersData.findIndex(order => order.orderID === orderId);
+            
+            if (orderIndex !== -1) {
+                // Update order status
+                ordersData[orderIndex].status = status;
+                
+                // Save updated orders back to localStorage
+                localStorage.setItem('orders', JSON.stringify(ordersData));
+                
+                // Re-render orders
+                renderOrders();
+            }
+        }
+    }
+    
+    // Function to remove an order completely
+    function removeOrder(orderId) {
+        if (!confirm('Are you sure you want to permanently remove this order from your history?')) {
+            return;
+        }
+        
+        if (useFirebase) {
+            // Find the order in Firebase and remove it
+            ordersRef.once('value').then((snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const order = childSnapshot.val();
+                    if (order.orderID === orderId) {
+                        ordersRef.child(childSnapshot.key).remove();
+                        return true;
+                    }
+                });
+            });
+        } else {
+            // Filter out the order with the given ID
+            ordersData = ordersData.filter(order => order.orderID !== orderId);
+            
+            // Save updated orders back to localStorage
+            localStorage.setItem('orders', JSON.stringify(ordersData));
+            
+            // Re-render orders
+            renderOrders();
+        }
+        
+        // Show success message
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Order removed successfully', 'success');
+        } else {
+            alert('Order removed successfully');
+        }
+    }
+    
+    function renderOrders() {
+        ordersListEl.innerHTML = '';
+        
+        if(ordersData.length === 0){
+            emptyMsgEl.style.display = 'block';
+        } else {
+            emptyMsgEl.style.display = 'none';
+            ordersData.forEach(order => {
+                const orderEl = document.createElement('div');
+                orderEl.className = 'p-6 border-b order-item transition duration-300';
+                
+                // Format order date
+                const orderDate = new Date(order.orderDate).toLocaleDateString('en-IN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Calculate total items
+                const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
+                
+                orderEl.innerHTML = `
+                    <div class="border border-pink-200 rounded-lg p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-pink-700">Order #${order.orderID}</h3>
+                                <p class="text-gray-600">${orderDate}</p>
+                            </div>
+                            <div class="mt-2 md:mt-0">
+                                <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium">
+                                    ${order.status}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-700 mb-2">Items (${totalItems})</h4>
+                            <div class="space-y-3">
+                                ${order.items.map(item => `
+                                    <div class="flex items-center">
+                                        <div class="image-placeholder w-12 h-12 rounded mr-3">
+                                            <img src="${item.img}" alt="${item.name}" class="w-12 h-12 object-cover rounded" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback w-12 h-12 flex items-center justify-center rounded\'><span class=\'text-xs\'>${item.name}</span></div>';">
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-medium">${item.name}</p>
+                                            <p class="text-sm text-gray-600">Qty: ${item.qty} × ₹${item.price}</p>
+                                        </div>
+                                        <p class="font-medium">₹${item.qty * item.price}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="font-bold text-gray-700 mb-2">Delivery Information</h4>
+                                    <p class="text-gray-600">${order.customerInfo.name}</p>
+                                    <p class="text-gray-600">${order.customerInfo.address || 'Address not provided'}</p>
+                                    <p class="text-gray-600">${order.customerInfo.city ? order.customerInfo.city + ', ' : ''}${order.customerInfo.pincode || ''}</p>
+                                    <p class="text-gray-600">Phone: ${order.customerInfo.phone || 'Not provided'}</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-700 mb-2">Order Summary</h4>
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between">
+                                            <span>Subtotal</span>
+                                            <span>₹${order.subtotal}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Delivery Charges</span>
+                                            <span>₹${order.deliveryCharge}</span>
+                                        </div>
+                                        <div class="flex justify-between font-bold text-lg text-pink-700">
+                                            <span>Total</span>
+                                            <span>₹${order.total}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Payment Method</span>
+                                            <span class="capitalize">${order.paymentMethod.replace('_', ' ')}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Delivery Date</span>
+                                            <span>${order.deliveryDate}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Delivery Time</span>
+                                            <span>${order.deliveryTime}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Add Cancel Order button with color based on delivery status -->
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <!-- Add Mark as Successful button -->
+                            <button class="mark-success-btn px-4 py-2 rounded-lg transition duration-300" 
+                                    data-order-id="${order.orderID}">
+                                Mark as Successful
+                            </button>
+                            <button class="cancel-order-btn px-4 py-2 rounded-lg transition duration-300" 
+                                    data-order-id="${order.orderID}"
+                                    ${order.status === 'Cancelled' || order.status === 'Delivered' ? 'disabled' : ''}>
+                                ${order.status === 'Cancelled' ? 'Order Cancelled' : 
+                                  order.status === 'Delivered' ? 'Order Delivered' : 
+                                  'Cancel Order'}
+                            </button>
+                            <!-- Add Remove Order button -->
+                            <button class="remove-order-btn px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition duration-300" 
+                                    data-order-id="${order.orderID}">
+                                Remove Order
+                            </button>
+                        </div>
+                    </div>
+                `;
+                ordersListEl.appendChild(orderEl);
+            });
+            
+            // Add event listeners for cancel buttons and set colors based on status
+            document.querySelectorAll('.cancel-order-btn').forEach(button => {
+                const orderId = button.getAttribute('data-order-id');
+                const order = ordersData.find(order => order.orderID === orderId);
+                
+                // Set button color based on order status
+                if (order.status === 'Delivered') {
+                    button.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white');
+                } else {
+                    button.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white');
+                }
+                
+                // Add click event for cancellation (only if not delivered or cancelled)
+                if (order.status !== 'Cancelled' && order.status !== 'Delivered') {
+                    button.addEventListener('click', function() {
+                        cancelOrder(orderId);
+                    });
+                }
+            });
+            
+            // Add event listeners for mark as successful buttons
+            document.querySelectorAll('.mark-success-btn').forEach(button => {
+                const orderId = button.getAttribute('data-order-id');
+                const order = ordersData.find(order => order.orderID === orderId);
+                
+                // Set initial button color based on order status
+                if (order.status === 'Delivered') {
+                    button.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white');
+                    button.textContent = 'Order Successful';
+                    button.disabled = true;
+                } else {
+                    button.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white');
+                }
+                
+                // Add click event for marking as successful (only if not already delivered)
+                if (order.status !== 'Delivered') {
+                    button.addEventListener('click', function() {
+                        markOrderSuccessful(orderId);
+                    });
+                }
+            });
+            
+            // Reinitialize feather icons for newly added elements
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        }
+    }
+
+    // Function to cancel an order
+    function cancelOrder(orderId) {
+        if (!confirm('Are you sure you want to cancel this order?')) {
+            return;
+        }
+        
+        // Update order status to 'Cancelled'
+        updateOrderStatus(orderId, 'Cancelled');
+        
+        // Show success message
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Order cancelled successfully', 'success');
+        } else {
+            alert('Order cancelled successfully');
+        }
+    }
+
+    // Function to mark an order as successful
+    function markOrderSuccessful(orderId) {
+        // Update order status to 'Delivered' (successful)
+        updateOrderStatus(orderId, 'Delivered');
+        
+        // Show success message
+        if (typeof showNotification !== 'undefined') {
+            showNotification('Order marked as successful', 'success');
+        } else {
+            alert('Order marked as successful');
+        }
+    }
+
+    // Initial render
+    loadOrders();
+    
+    // Add event listener for remove buttons
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-order-btn')) {
+            const orderId = e.target.getAttribute('data-order-id');
+            removeOrder(orderId);
+        }
+    });
+});
+</script>
+<script src="scripts.js"></script>
+<script src="user.js"></script>
+<script src="performance.js"></script>
+</body>
+</html>
